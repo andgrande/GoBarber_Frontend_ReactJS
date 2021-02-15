@@ -140,9 +140,11 @@ const Dashboard: React.FC = () => {
   }, [appointments]);
 
   const nextAppointment = useMemo(() => {
-    return appointments.find(appointment =>
-      isAfter(parseISO(appointment.date), new Date()),
-    );
+    return appointments
+      .sort((a, b) => (a.hourFormatted > b.hourFormatted ? 1 : -1))
+      .find(appointment => {
+        return isAfter(parseISO(appointment.date), new Date());
+      });
   }, [appointments]);
 
   return (
@@ -171,10 +173,24 @@ const Dashboard: React.FC = () => {
       <Content>
         <SubContent>
           <PanelSelection>
-            <button type="button">Meus agendamentos</button>
-            <button type="button">Agendar Novo horário</button>
+            <button
+              type="button"
+              onClick={() => {
+                setisSetNewAppointmentPanelOn(false);
+              }}
+            >
+              Meus agendamentos
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setisSetNewAppointmentPanelOn(true);
+              }}
+            >
+              Agendar Novo horário
+            </button>
           </PanelSelection>
-          {isSetNewAppointmentPanelOn ? (
+          {!isSetNewAppointmentPanelOn ? (
             <Schedule>
               <h1>Horário Agendado</h1>
               <p>
@@ -251,7 +267,7 @@ const Dashboard: React.FC = () => {
             </Schedule>
           ) : (
             <Schedule>
-              <h1>Horário Agendado</h1>
+              <h1>Disponibilidade</h1>
               <p>
                 {isToday(selectedDate) && <span>Hoje</span>}
                 <span>{selectedDateAsText}</span>

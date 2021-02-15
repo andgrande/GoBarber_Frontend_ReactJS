@@ -61,10 +61,11 @@ export const Profile = styled.div`
     text-decoration: none;
     color: #ff9000;
     transition: 0.2s;
-    &:hover {
 
+    &:hover {
       opacity: 0.8;
     }
+  }
 `;
 
 export const Content = styled.main`
@@ -76,24 +77,46 @@ export const Content = styled.main`
 export const SubContent = styled.div`
   flex: 1;
   flex-direction: column;
+  margin-right: 120px;
 `;
 
 export const PanelSelection = styled.div`
-  display: flex;
   flex: 1;
   flex-direction: row;
+  text-align: start;
 
-  justify-content: space-between;
-  align-items: center;
+  border-bottom: 10px;
 
   & button {
-    flex: 1;
+    font-weight: 500;
+    height: 56px;
+    width: 50%;
+    color: #fff;
+    background: #3e3b47;
+    border: 0;
+    border-radius: 10px 0 0 10px;
+    transition: 0.2s;
+
+    :hover {
+      background: ${shade(0.3, '#3e3b47')};
+    }
+
+    :focus {
+      background: ${shade(0.3, '#3e3b47')};
+    }
+
+    + button {
+      border-left: 2px;
+      border-style: solid;
+      border-color: #312e38;
+      border-radius: 0 10px 10px 0;
+    }
   }
 `;
 
 export const Schedule = styled.div`
   flex: 1;
-  margin-right: 120px;
+  margin-top: 25px;
 
   h1 {
     font-size: 36px;

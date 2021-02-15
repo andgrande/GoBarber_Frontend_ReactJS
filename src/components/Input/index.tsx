@@ -56,6 +56,7 @@ const Input: React.FC<InputProps> = ({
       onBlur={handleInputBlur}
       isFocused={isFocused}
       isFilled={isFilled}
+      data-testid="input-container"
     >
       {Icon && <Icon size={20} />}
       <input ref={inputRef} {...rest} />
