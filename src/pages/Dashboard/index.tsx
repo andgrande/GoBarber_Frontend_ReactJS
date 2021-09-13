@@ -18,17 +18,27 @@ import {
   Profile,
   Content,
   SubContent,
+  SubContentDateHour,
   PanelSelection,
   Schedule,
   NexAppointment,
   Section,
   Appointment,
+  ProvidersList,
   Calendar,
+  TimeTable,
+  Hour,
+  ConfirmAppointment,
 } from './styles';
 import api from '../../services/api';
 
 interface MonthAvailabilityItem {
   day: number;
+  available: boolean;
+}
+
+interface HourAvailabilityItem {
+  hour: number;
   available: boolean;
 }
 
@@ -42,43 +52,114 @@ interface AppointmentsItem {
   };
 }
 
+export interface Provider {
+  id: string;
+  name: string;
+  avatar_url: string;
+}
+
 const Dashboard: React.FC = () => {
-  const [isSetNewAppointmentPanelOn, setisSetNewAppointmentPanelOn] = useState(
-    false,
-  );
+  const { signOut, user } = useAuth();
+  const [
+    isSetNewAppointmentPanelOn,
+    setisSetNewAppointmentPanelOn,
+  ] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
-  const { signOut, user } = useAuth();
+  const [selectedHour, setSelectedHour] = useState<number | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string>(user.id);
 
   const [monthAvailability, setMonthAvailability] = useState<
     MonthAvailabilityItem[]
   >([]);
 
+  const [hourAvailability, setHourAvailability] = useState<
+    HourAvailabilityItem[]
+  >([]);
+
   const [appointments, setAppointments] = useState<AppointmentsItem[]>([]);
 
-  const handleDateChange = useCallback((day: Date, modifiers: DayModifiers) => {
-    if (modifiers.available && !modifiers.disabled) {
-      setSelectedDate(day);
+  const [providers, setProviders] = useState<Provider[]>([]);
+
+  const handleDayAvailability = useCallback(() => {
+    api
+      .get(`/providers/${selectedProvider}/day-availability`, {
+        params: {
+          year: selectedDate.getFullYear(),
+          month: selectedDate.getMonth() + 1,
+          day: selectedDate.getDate(),
+        },
+      })
+      .then(response => {
+        setHourAvailability(response.data);
+      });
+  }, [selectedDate, selectedProvider]);
+
+  const handleCreateAppointment = useCallback(async () => {
+    try {
+      if (selectedHour) {
+        const date = new Date(selectedDate);
+        date.setHours(selectedHour);
+        date.setMinutes(0);
+        const log = await api.post('/appointments', {
+          provider_id: selectedProvider,
+          date,
+        });
+        console.log(log);
+        console.log('log');
+      }
+      // navigation.navigate('AppointmentCreated', { date: date.getTime() });
+    } catch (err) {
+      console.log(err);
     }
   }, []);
+
+  const handleSelectProvider = useCallback(
+    provider_id => {
+      setSelectedProvider(provider_id);
+
+      if (selectedProvider) {
+        handleDayAvailability();
+      }
+    },
+    [handleDayAvailability, selectedProvider],
+  );
+
+  const handleDateChange = useCallback(
+    (day: Date, modifiers: DayModifiers) => {
+      if (modifiers.available && !modifiers.disabled) {
+        setSelectedDate(day);
+      }
+
+      if (selectedProvider) {
+        handleDayAvailability();
+      }
+    },
+    [handleDayAvailability, selectedProvider],
+  );
 
   const handleMonthChange = useCallback((month: Date) => {
     setCurrentMonth(month);
   }, []);
 
   useEffect(() => {
-    api
-      .get(`/providers/${user.id}/month-availability`, {
-        params: {
-          year: currentMonth.getFullYear(),
-          month: currentMonth.getMonth() + 1,
-        },
-      })
-      .then(response => {
-        setMonthAvailability(response.data);
+    if (!isSetNewAppointmentPanelOn) {
+      api
+        .get(`/providers/${user.id}/month-availability`, {
+          params: {
+            year: currentMonth.getFullYear(),
+            month: currentMonth.getMonth() + 1,
+          },
+        })
+        .then(response => {
+          setMonthAvailability(response.data);
+        });
+    } else {
+      api.get('/providers').then(response => {
+        setProviders(response.data);
       });
-  }, [currentMonth, user.id]);
+    }
+  }, [currentMonth, user.id, isSetNewAppointmentPanelOn]);
 
   useEffect(() => {
     api
@@ -147,6 +228,10 @@ const Dashboard: React.FC = () => {
       });
   }, [appointments]);
 
+  // console.log(monthAvailability);
+  // console.log(hourAvailability);
+  // console.log(providers);
+
   return (
     <Container>
       <Header>
@@ -175,6 +260,9 @@ const Dashboard: React.FC = () => {
           <PanelSelection>
             <button
               type="button"
+              // style={
+              //   isSetNewAppointmentPanelOn ? {} : { backgroundColor: '#3e3b47' }
+              // }
               onClick={() => {
                 setisSetNewAppointmentPanelOn(false);
               }}
@@ -183,6 +271,9 @@ const Dashboard: React.FC = () => {
             </button>
             <button
               type="button"
+              // style={
+              //   isSetNewAppointmentPanelOn ? { backgroundColor: '#3e3b47' } : {}
+              // }
               onClick={() => {
                 setisSetNewAppointmentPanelOn(true);
               }}
@@ -273,102 +364,97 @@ const Dashboard: React.FC = () => {
                 <span>{selectedDateAsText}</span>
                 <span>{selectedWeekDay}</span>
               </p>
+              <p>
+                {selectedHour && (
+                  <>
+                    <span>Às</span>
+                    <span>{selectedHour}</span>
+                  </>
+                )}
+              </p>
 
-              {isToday(selectedDate) && nextAppointment && (
-                <NexAppointment>
-                  <strong>Atendimento a seguir</strong>
-                  <div>
+              <ProvidersList>
+                {providers.map(provider => (
+                  // <div key={provider.id}>
+                  <button
+                    key={provider.id}
+                    type="button"
+                    onClick={() => handleSelectProvider(provider.id)}
+                  >
                     <img
-                      src={nextAppointment.user.avatar_url}
-                      alt={nextAppointment.user.name}
+                      src={
+                        provider.avatar_url ? provider.avatar_url : nullAvatar
+                      }
+                      alt={provider.name}
                     />
-                    <strong>{nextAppointment.user.name}</strong>
-                    <span>
-                      <FiClock />
-                      {nextAppointment.hourFormatted}
-                    </span>
-                  </div>
-                </NexAppointment>
-              )}
-
-              <Section>
-                <strong>Manhã</strong>
-
-                {morningAppointments.length === 0 && (
-                  <p>Nenhum agendamento neste período</p>
-                )}
-
-                {morningAppointments.map(appointment => (
-                  <Appointment key={appointment.id}>
-                    <span>
-                      <FiClock />
-                      {appointment.hourFormatted}
-                    </span>
-
-                    <div>
-                      <img
-                        src={appointment.user.avatar_url}
-                        alt={appointment.user.name}
-                      />
-                      <strong>{appointment.user.name}</strong>
-                    </div>
-                  </Appointment>
+                    <strong>{provider.name}</strong>
+                  </button>
                 ))}
-              </Section>
-
-              <Section>
-                <strong>Tarde</strong>
-                {afternoonAppointments.length === 0 && (
-                  <p>Nenhum agendamento neste período</p>
-                )}
-
-                {afternoonAppointments.map(appointment => (
-                  <Appointment key={appointment.id}>
-                    <span>
-                      <FiClock />
-                      {appointment.hourFormatted}
-                    </span>
-
-                    <div>
-                      <img
-                        src={appointment.user.avatar_url}
-                        alt={appointment.user.name}
-                      />
-                      <strong>{appointment.user.name}</strong>
-                    </div>
-                  </Appointment>
-                ))}
-              </Section>
+              </ProvidersList>
             </Schedule>
           )}
         </SubContent>
-        <Calendar>
-          <DayPicker
-            weekdaysShort={['D', 'S', 'T', 'Q', 'Q', 'S', 'S']}
-            fromMonth={new Date()}
-            disabledDays={[{ daysOfWeek: [0, 6] }, ...disabledDays]}
-            modifiers={{
-              available: { daysOfWeek: [1, 2, 3, 4, 5] },
-            }}
-            selectedDays={selectedDate}
-            onDayClick={handleDateChange}
-            onMonthChange={handleMonthChange}
-            months={[
-              'Janeiro',
-              'Fevereiro',
-              'Março',
-              'Abril',
-              'Maio',
-              'Junho',
-              'Julho',
-              'Agosto',
-              'Setembro',
-              'Outubro',
-              'Novembro',
-              'Dezembro',
-            ]}
-          />
-        </Calendar>
+        <SubContentDateHour>
+          <Calendar>
+            <DayPicker
+              weekdaysShort={['D', 'S', 'T', 'Q', 'Q', 'S', 'S']}
+              fromMonth={new Date()}
+              disabledDays={[{ daysOfWeek: [0, 6] }, ...disabledDays]}
+              modifiers={{
+                available: { daysOfWeek: [1, 2, 3, 4, 5] },
+              }}
+              selectedDays={selectedDate}
+              onDayClick={handleDateChange}
+              onMonthChange={handleMonthChange}
+              months={[
+                'Janeiro',
+                'Fevereiro',
+                'Março',
+                'Abril',
+                'Maio',
+                'Junho',
+                'Julho',
+                'Agosto',
+                'Setembro',
+                'Outubro',
+                'Novembro',
+                'Dezembro',
+              ]}
+            />
+          </Calendar>
+          {isSetNewAppointmentPanelOn && (
+            <>
+              <TimeTable>
+                {hourAvailability.map(hour => (
+                  <Hour isAvailable={hour.available}>
+                    <button
+                      // style={{
+                      //   backgroundColor: hour.available ? '' : '#CCC',
+                      // }}
+                      type="button"
+                      onClick={() => setSelectedHour(9)}
+                    >
+                      <span>
+                        {hour.hour}
+                        :00
+                      </span>
+                    </button>
+                  </Hour>
+                ))}
+              </TimeTable>
+              {isSetNewAppointmentPanelOn && selectedHour && (
+                <ConfirmAppointment>
+                  <button
+                    type="submit"
+                    onClick={() => handleCreateAppointment()}
+                  >
+                    Confirmar Agendamento
+                  </button>
+                </ConfirmAppointment>
+              )}
+            </>
+          )}
+        </SubContentDateHour>
       </Content>
     </Container>
   );

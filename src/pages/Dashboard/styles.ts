@@ -1,5 +1,13 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { shade } from 'polished';
+
+interface MainPanelSelection {
+  isSelected: boolean;
+}
+
+interface HourAvailability {
+  isAvailable: boolean;
+}
 
 export const Container = styled.div``;
 
@@ -78,6 +86,10 @@ export const SubContent = styled.div`
   flex: 1;
   flex-direction: column;
   margin-right: 120px;
+`;
+
+export const SubContentDateHour = styled.div`
+  flex-direction: column;
 `;
 
 export const PanelSelection = styled.div`
@@ -261,6 +273,58 @@ export const Appointment = styled.div`
   }
 `;
 
+export const ProvidersList = styled.div`
+  margin-top: 64px;
+  display: flex;
+  flex-wrap: wrap;
+
+  button {
+    border: 0;
+
+    background: #3e3b47;
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    margin-top: 20px;
+    margin-right: 20px;
+    border-radius: 10px;
+    max-width: 250px;
+    height: 80px;
+    position: relative;
+    transition: 0.2s;
+
+    &::before {
+      content: '';
+      background: #ff9000;
+      position: absolute;
+      height: 80%;
+      width: 1px;
+      left: 0;
+      top: 10%;
+    }
+
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    strong {
+      margin-left: 24px;
+      color: #fff;
+    }
+
+    :hover {
+      background: ${shade(0.3, '#3e3b47')};
+    }
+
+    :focus {
+      background: #ff9900;
+      color: #232129;
+    }
+  }
+`;
+
 export const Calendar = styled.aside`
   width: 380px;
 
@@ -337,5 +401,91 @@ export const Calendar = styled.aside`
     background: #ff9000 !important;
     border-radius: 10px;
     color: #232129 !important;
+  }
+`;
+
+export const TimeTable = styled.div`
+  width: 380px;
+  margin-top: 30px;
+  border-radius: 10px;
+  background-color: #28262e;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  padding: 10px 20px 20px;
+`;
+
+export const Hour = styled.div<HourAvailability>`
+  margin-left: 20px;
+  margin-top: 10px;
+
+  button {
+    width: 60px;
+    height: 30px;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #3e3b47;
+    color: #fff;
+    border: 0;
+    transition: 0.2s;
+
+    ${props =>
+      props.isAvailable
+        ? css`
+            background: #3e3b47;
+          `
+        : css`
+            background: ${shade(0.3, '#3e3b47')};
+          `}
+
+    :hover {
+      background: ${shade(0.2, '#3e3b47')};
+    }
+
+    :focus {
+      background: #ff9900;
+      color: #232129;
+    }
+  }
+`;
+
+export const ConfirmAppointment = styled.div`
+  width: 380px;
+  margin-top: 30px;
+  border-radius: 10px;
+  background-color: #28262e;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #3e3b47;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 50px;
+    transition: 0.2s;
+
+    :hover {
+      background: #ff9900;
+      color: #232129;
+    }
+
+    :focus {
+      background: #ff9900;
+      color: #232129;
+    }
   }
 `;
