@@ -1,47 +1,66 @@
-# Getting Started with Create React App
+# GoBarber frontend (React.js)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Project developed during [Rocketseat](https://github.com/rocketseat-education) bootcamp
 
-## Available Scripts
+## Technology
 
-In the project directory, you can run:
+- Javascript with Typescript
+- ReactJs library
 
-### `yarn start`
+## Concepts and technologies applied in this project:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Abstract the application into components
+- Use of context to share data throughout the pages
+- Password encryption
+- Input data validation
+- Automated tests with Jest framework
+- Integration with REST API
+- CSS and Styled-components
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Features included
 
-### `yarn test`
+- Upload of files
+- Password encryption
+- Filter appointments per date
+- Set appoinment
+- Change personal details
+- Reset password
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## List of pages
 
-### `yarn build`
+### Login
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+![Login](appImages/Login.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Dashboard
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+![Dashboard](appImages/Dashboard.png)
 
-### `yarn eject`
+### Profile
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+![Profile](appImages/Profile.png)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Signup
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+![Signup](appImages/Signup.png)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Reset Password
 
-## Learn More
+![Reset Password](appImages/Password.png)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## List of services used in the application
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-# gobarber-frontend
+| Name | Type | Description | Endpoint |
+| ------------------- | ------------------- | ------------------- | ------------------- |
+|  Users | `POST` | Register user | `hostURL`/users |
+|  Users | `POST` | Autheticate user | `hostURL`/sessions |
+|  Users | `POST` | Forgot password email | `hostURL`/password/forgot |
+|  Users | `POST` | Reset password | `hostURL`/password/reset |
+|  Users | `PATCH` | Update user's avatar | `hostURL`/users/avatar |
+|  Users | `PUT` | Update profile | `hostURL`/profile |
+|  Users | `GET` | Retrieve profile main data | `hostURL`/profile |
+|  Appointments | `GET` | List all providers | `hostURL`/providers |
+|  Appointments | `GET` | List provider appointments | `hostURL`/appointments/me |
+|  Appointments | `GET` | List provider days Availability | `hostURL`/providers/`:id`/day-availability |
+|  Appointments | `GET` | List providers Month Availability | `hostURL`/providers/`:id`/month-availability |
+|  Appointments | `POST` | Create appointment | `hostURL`/appointments |
