@@ -28,7 +28,7 @@ Project developed during [Rocketseat](https://github.com/rocketseat-education) b
 
 ## List of pages
 
-### Login
+#### Login
 
 ![Login](appImages/Login.png)
 
@@ -36,15 +36,15 @@ Project developed during [Rocketseat](https://github.com/rocketseat-education) b
 
 ![Dashboard](appImages/Dashboard.png)
 
-### Profile
+#### Profile
 
 ![Profile](appImages/Profile.png)
 
-### Signup
+#### Signup
 
 ![Signup](appImages/Signup.png)
 
-### Reset Password
+#### Reset Password
 
 ![Reset Password](appImages/Password.png)
 
